@@ -22,6 +22,8 @@ if AngleModelFlag=='tf':
     keep_prob = tf.placeholder(tf.float32)
     
 else:
+   import logging
+   logging.info("loading model by cv2 from {}".format(AngleModelPb))
    angleNet = cv2.dnn.readNetFromTensorflow(AngleModelPb,AngleModelPbtxt)##dnn 文字方向检测
 textNet  = cv2.dnn.readNetFromDarknet(yoloCfg,yoloWeights)##文字定位
 
@@ -38,21 +40,21 @@ def text_detect(img,scale,maxScale,prob = 0.05):
     confidences = []
     boxes = []
     for output in outputs:
-            for detection in output:
-                scores = detection[5:]
-                class_id = np.argmax(scores)
-                confidence = scores[class_id]
-                if confidence > thresh:
-                    center_x = int(detection[0] * scale/f)
-                    center_y = int(detection[1] * scale/f)
-                    width = int(detection[2] * scale/f)
-                    height = int(detection[3] * scale/f)
-                    left = int(center_x - width / 2)
-                    top = int(center_y - height / 2)
-                    if class_id==1:
-                        class_ids.append(class_id)
-                        confidences.append(float(confidence))
-                        boxes.append([left, top,left+width, top+height ])
+        for detection in output:
+            scores = detection[5:]
+            class_id = np.argmax(scores)
+            confidence = scores[class_id]
+            if confidence > thresh:
+                center_x = int(detection[0] * scale/f)
+                center_y = int(detection[1] * scale/f)
+                width = int(detection[2] * scale/f)
+                height = int(detection[3] * scale/f)
+                left = int(center_x - width / 2)
+                top = int(center_y - height / 2)
+                if class_id==1:
+                    class_ids.append(class_id)
+                    confidences.append(float(confidence))
+                    boxes.append([left, top,left+width, top+height ])
         
     boxes = np.array(boxes)
     confidences = np.array(confidences)

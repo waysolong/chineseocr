@@ -148,6 +148,7 @@ class OCR:
                                                 
                 if textLine:
                     ##单行识别
+                    logging.info("single line det")
                     partImg = Image.fromarray(img)
                     text    = crnn.predict(partImg.convert('L'))
                     res =[ {'text':text,'name':'0','box':[0,0,W,0,W,H,0,H]} ]
@@ -174,6 +175,7 @@ class OCR:
         
         
                     if billModel=='' or billModel=='通用OCR' :
+                        logging.info("general OCR rec")
                         result = union_rbox(result,0.2)
                         res = [{'text':x['text'],
                                 'name':str(i),
@@ -188,12 +190,13 @@ class OCR:
                         res = adjust_box_to_origin(img,angle, res)##修正box
         
                     elif billModel=='火车票':
+                        logging.info("train ticket rec")
                         res = trainTicket.trainTicket(result)
                         res = res.res
                         res =[ {'text':res[key],'name':key,'box':{}} for key in res]
         
                     elif billModel=='身份证':
-        
+                        logging.info("ID card rec")
                         res = idcard.idcard(result)
                         res = res.res
                         res =[ {'text':res[key],'name':key,'box':{}} for key in res]
